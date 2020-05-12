@@ -3,6 +3,7 @@ import { createSocketServer } from './socket';
 import { Server } from 'socket.io';
 import BusSocketService from './busSocketService';
 import ClientSocketService from './clientSocketService';
+import BusRepository from './busRepository';
 
 const server: fastify.FastifyInstance = fastify({logger: true});
 
@@ -12,12 +13,13 @@ server.get('/', {}, async () => {
 
 const 
     socketServer: Server = createSocketServer(server.server),
-    clientSocketService: ClientSocketService = new ClientSocketService(socketServer),
-    busSocketService: BusSocketService = new BusSocketService(socketServer, clientSocketService);
+    busRepository: BusRepository = new BusRepository(),
+    clientSocketService: ClientSocketService = new ClientSocketService(socketServer, busRepository),
+    busSocketService: BusSocketService = new BusSocketService(socketServer, clientSocketService, busRepository);
 
 const env = process.env.NODE_ENV || 'development',
     port = process.env.PORT || 3000;
-    
+
 const startServer = async () => {
     let options: any = {port: port};
 
