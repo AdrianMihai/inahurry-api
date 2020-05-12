@@ -4,6 +4,8 @@ import { Server } from 'socket.io';
 import BusSocketService from './busSocketService';
 import ClientSocketService from './clientSocketService';
 
+const env = process.env.NODE_ENV || 'development';
+
 const server: fastify.FastifyInstance = fastify({logger: true});
 
 server.get('/', {}, async () => {
@@ -16,8 +18,14 @@ const
     busSocketService: BusSocketService = new BusSocketService(socketServer, clientSocketService);
 
 const startServer = async () => {
+    let options: any = {port: 3000};
+
+    if (env === 'development') {
+        options.host = '0.0.0.0'
+    }
+
     try {
-        await server.listen({ port: 3000, host: '0.0.0.0'})
+        await server.listen(options);
     } catch (e) {
         server.log.error(e.message)
     }
